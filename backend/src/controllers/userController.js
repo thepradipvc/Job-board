@@ -33,6 +33,7 @@ export const registerUser = asyncHandler(
         name,
         email,
         password: hashedPassword,
+        role: "admin",
       })
       .returning();
 
