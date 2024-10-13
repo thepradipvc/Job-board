@@ -1,0 +1,9 @@
+services:
+  postgres:
+    image: "postgres:15.2-alpine"
+    environment:
+      POSTGRES_USER: cpra
+      POSTGRES_PASSWORD: cpra
+      POSTGRES_DB: cpra
+    ports:
+      - "5432:5432"
