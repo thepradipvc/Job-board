@@ -1,10 +1,3 @@
-import { clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
-
-export function cn(...inputs) {
-  return twMerge(clsx(inputs))
-}
-
 // Date helpers
 const relativeFormatter = new Intl.RelativeTimeFormat(undefined, {
   numeric: "auto",

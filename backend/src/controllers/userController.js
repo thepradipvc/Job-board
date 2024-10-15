@@ -71,3 +71,15 @@ export const loginUser = asyncHandler(async (req, res) => {
 export const getMe = asyncHandler(async (req, res) => {
   res.status(200).json(req.user);
 });
+
+export const logoutUser = asyncHandler(async (req, res) => {
+  // Clear the auth_token cookie
+  res.clearCookie('auth_token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/'
+  });
+
+  res.status(200).json({ message: "Logged out successfully" });
+});

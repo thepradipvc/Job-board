@@ -1,14 +1,19 @@
-import axios from "axios";
+import apiInstance from "@/lib/api-instance";
 
 export const login = async (loginInfo) => {
-    return await axios.post("/api/users/login", loginInfo);
+    return await apiInstance.post("/users/login", loginInfo);
 };
 
 export const register = async (registerInfo) => {
-    return await axios.post("/api/users/register", registerInfo);
+    return await apiInstance.post("/users/register", registerInfo);
 };
 
 export const getMe = async () => {
-    const res = await axios.get("/api/users/me");
+    const res = await apiInstance.get("/users/me");
     return { isLoggedIn: res.status === 200, user: res.data };
 };
+
+export const logout = async () => {
+    await apiInstance.post("/users/logout");
+    return "Logged out successfully";
+}

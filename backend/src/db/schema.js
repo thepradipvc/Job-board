@@ -13,6 +13,7 @@ import {
 
 export const roleEnum = pgEnum('role', ['admin', 'student', 'company']);
 export const genderEnum = pgEnum('gender', ['male', 'female', 'other']);
+export const applicationStatusEnum = pgEnum('status', ['pending', 'accepted', 'rejected']);
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -24,15 +25,9 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const usersRelations = relations(users, ({ one, many }) => ({
-  companies: many(companies, {
-    fields: [companies.userId],
-    references: [users.id],
-  }),
-  students: many(students, {
-    fields: [students.userId],
-    references: [users.id],
-  }),
+export const usersRelations = relations(users, ({ one }) => ({
+  company: one(companies),
+  student: one(students)
 }));
 
 export const companies = pgTable("companies", {
@@ -110,7 +105,7 @@ export const applications = pgTable("applications", {
   id: serial("id").primaryKey(),
   jobId: integer("job_id").references(() => jobs.id).notNull(),
   studentId: integer("student_id").references(() => students.id).notNull(),
-  status: pgEnum("status", ["pending", "accepted", "rejected"]).default("pending"),
+  status: applicationStatusEnum("status").default("pending"),
   appliedAt: timestamp("applied_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   offeredSalary: integer("offered_salary"),

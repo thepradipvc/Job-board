@@ -9,6 +9,9 @@ dotEnv.config({
 });
 
 import userRouter from "./routes/userRouter.js";
+import studentRouter from './routes/studentRouter.js';
+import companyRouter from './routes/companyRouter.js';
+import adminRouter from './routes/adminRouter.js';
 import errorHandler from "./middlewares/errorMiddleware.js";
 
 const app = express();
@@ -18,6 +21,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/users", userRouter);
+app.use("/api/students", studentRouter);
+app.use("/api/companies", companyRouter);
+app.use("/api/admin", adminRouter);
 
 // Serve static files from the frontend in production
 if (process.env.NODE_ENV === "production") {

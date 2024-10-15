@@ -20,7 +20,7 @@ const authMiddleware = asyncHandler(
         );
 
         // Get user from the token
-        const user = await db.query.usersTable.findFirst({
+        const user = await db.query.users.findFirst({
           where: eq(SCHEMA.users.id, decoded.id),
           columns: {
             password: false,
@@ -34,6 +34,20 @@ const authMiddleware = asyncHandler(
 
         req.user = user;
 
+        if (user.role === "student") {
+          const [student] = await db.query.students.findFirst({
+            where: eq(SCHEMA.students.userId, user.id)
+          })
+          req.user.studentId = student?.id
+        }
+
+        if (user.role === "company") {
+          const [company] = await db.query.companies.findFirst({
+            where: eq(SCHEMA.companies.userId, user.id)
+          })
+          req.user.companyId = company?.id
+        }
+
         next();
       } catch (error) {
         res.status(401);
@@ -45,6 +59,16 @@ const authMiddleware = asyncHandler(
       res.status(401);
       throw new Error("Not authorised");
     }
+  }
+);
+
+export const adminOnly = asyncHandler(
+  async (req, res, next) => {
+    if (req.user && req.user.role !== "admin") {
+      res.status(403);
+      throw new Error("Not authorized as an admin");
+    }
+    next();
   }
 );
 
