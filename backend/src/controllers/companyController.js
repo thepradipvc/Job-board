@@ -1,58 +1,7 @@
-import bcrypt from "bcrypt";
 import { and, count, eq } from "drizzle-orm";
 import asyncHandler from "express-async-handler";
 import { db } from "../db/index.js";
 import SCHEMA from "../db/schema.js";
-
-export const addCompany = asyncHandler(async (req, res) => {
-    const { name, email, password } = req.body;
-
-    // Check if the user making the request is an admin
-    if (req.user.role !== 'admin') {
-        res.status(403);
-        throw new Error("Only admins can add companies");
-    }
-
-    // Check if company already exists
-    const [companyExists] = await db
-        .select()
-        .from(SCHEMA.users)
-        .where(eq(SCHEMA.users.email, email));
-
-    if (companyExists) {
-        res.status(400);
-        throw new Error("Company already exists with this email.");
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    // Create user
-    const [user] = await db
-        .insert(SCHEMA.users)
-        .values({
-            name,
-            email,
-            password: hashedPassword,
-            role: "company",
-        })
-        .returning();
-
-    // Create basic company profile
-    const [company] = await db
-        .insert(SCHEMA.companies)
-        .values({
-            userId: user.id,
-        })
-        .returning();
-
-    res.status(201).json({
-        message: "Company added successfully",
-        company: {
-            id: company.id,
-            name: user.name,
-            email: user.email,
-        },
-    });
-});
 
 // Update company profile
 export const updateCompanyProfile = asyncHandler(async (req, res) => {

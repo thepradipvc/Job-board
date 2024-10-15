@@ -29,13 +29,13 @@ const Layout = ({ children }) => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="py-4 px-8 border-b shadow-sm h-20">
-          <div className="ml-auto w-max">
-            <UserDropDown />
-          </div>
+        <header className="flex items-center justify-end border-b shadow-sm h-20 min-h-20 pr-8">
+          <UserDropDown />
         </header>
 
-        <main className="p-10">{children}</main>
+        <main className="p-10 min-h-[calc(100vh-80px)] overflow-y-scroll">
+          {children}
+        </main>
       </div>
     </div>
   );

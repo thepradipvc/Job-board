@@ -2,6 +2,97 @@ import asyncHandler from "express-async-handler";
 import { db } from "../db/index.js";
 import SCHEMA from "../db/schema.js";
 import { count, eq } from "drizzle-orm";
+import bcrypt from "bcrypt";
+
+export const addStudent = asyncHandler(async (req, res) => {
+    const { name, email, password } = req.body;
+
+    // Check if student already exists
+    const [studentExists] = await db
+        .select()
+        .from(SCHEMA.users)
+        .where(eq(SCHEMA.users.email, email));
+
+    if (studentExists) {
+        res.status(400);
+        throw new Error("Student already exists with this email.");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    // Create user
+    const [user] = await db
+        .insert(SCHEMA.users)
+        .values({
+            name,
+            email,
+            password: hashedPassword,
+            role: "student",
+        })
+        .returning();
+
+    // Create basic student profile
+    const [student] = await db
+        .insert(SCHEMA.students)
+        .values({
+            userId: user.id,
+        })
+        .returning();
+
+    res.status(201).json({
+        message: "Student added successfully",
+        student: {
+            id: student.id,
+            name: user.name,
+            email: user.email,
+            password
+        },
+    });
+});
+
+export const addCompany = asyncHandler(async (req, res) => {
+    const { name, email, password } = req.body;
+
+    // Check if company already exists
+    const [companyExists] = await db
+        .select()
+        .from(SCHEMA.users)
+        .where(eq(SCHEMA.users.email, email));
+
+    if (companyExists) {
+        res.status(400);
+        throw new Error("Company already exists with this email.");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    // Create user
+    const [user] = await db
+        .insert(SCHEMA.users)
+        .values({
+            name,
+            email,
+            password: hashedPassword,
+            role: "company",
+        })
+        .returning();
+
+    // Create basic company profile
+    const [company] = await db
+        .insert(SCHEMA.companies)
+        .values({
+            userId: user.id,
+        })
+        .returning();
+
+    res.status(201).json({
+        message: "Company added successfully",
+        company: {
+            id: company.id,
+            name: user.name,
+            email: user.email,
+            password
+        },
+    });
+});
 
 // List all students
 export const listStudents = asyncHandler(async (req, res) => {

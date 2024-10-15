@@ -18,7 +18,7 @@ export default function SignIn() {
     onSuccess: () => {
       queryClient.clear();
       navigate("/dashboard");
-      toast.success("Logged in successfully");
+      toast.success("Signed in successfully");
     },
     onError: (error) => {
       toast.error(error.response.data.message);

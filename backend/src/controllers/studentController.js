@@ -1,58 +1,7 @@
-import bcrypt from "bcrypt";
 import { and, eq } from "drizzle-orm";
 import asyncHandler from "express-async-handler";
 import { db } from "../db/index.js";
 import SCHEMA from "../db/schema.js";
-
-export const addStudent = asyncHandler(async (req, res) => {
-    const { name, email, password } = req.body;
-
-    // Check if the user making the request is an admin
-    if (req.user.role !== 'admin') {
-        res.status(403);
-        throw new Error("Only admins can add students");
-    }
-
-    // Check if student already exists
-    const [studentExists] = await db
-        .select()
-        .from(SCHEMA.users)
-        .where(eq(SCHEMA.users.email, email));
-
-    if (studentExists) {
-        res.status(400);
-        throw new Error("Student already exists with this email.");
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    // Create user
-    const [user] = await db
-        .insert(SCHEMA.users)
-        .values({
-            name,
-            email,
-            password: hashedPassword,
-            role: "student",
-        })
-        .returning();
-
-    // Create basic student profile
-    const [student] = await db
-        .insert(SCHEMA.students)
-        .values({
-            userId: user.id,
-        })
-        .returning();
-
-    res.status(201).json({
-        message: "Student added successfully",
-        student: {
-            id: student.id,
-            name: user.name,
-            email: user.email,
-        },
-    });
-});
 
 // Update student profile details
 export const updateStudentProfile = asyncHandler(async (req, res) => {

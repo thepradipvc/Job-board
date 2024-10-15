@@ -35,14 +35,14 @@ const authMiddleware = asyncHandler(
         req.user = user;
 
         if (user.role === "student") {
-          const [student] = await db.query.students.findFirst({
+          const student = await db.query.students.findFirst({
             where: eq(SCHEMA.students.userId, user.id)
           })
           req.user.studentId = student?.id
         }
 
         if (user.role === "company") {
-          const [company] = await db.query.companies.findFirst({
+          const company = await db.query.companies.findFirst({
             where: eq(SCHEMA.companies.userId, user.id)
           })
           req.user.companyId = company?.id
@@ -50,6 +50,7 @@ const authMiddleware = asyncHandler(
 
         next();
       } catch (error) {
+        console.log(error)
         res.status(401);
         throw new Error("Not authorised");
       }

@@ -4,7 +4,9 @@ import {
     listCompanies,
     listJobs,
     listApplications,
-    getStats
+    getStats,
+    addStudent,
+    addCompany
 } from '../controllers/adminController.js';
 import authMiddleware, { adminOnly } from '../middlewares/authMiddleware.js';
 
@@ -13,6 +15,8 @@ const router = express.Router();
 // Apply protect and adminOnly middleware to all routes
 router.use(authMiddleware, adminOnly);
 
+router.post('/add-student', addStudent);
+router.post('/add-company', addCompany);
 router.get('/students', listStudents);
 router.get('/companies', listCompanies);
 router.get('/jobs', listJobs);
