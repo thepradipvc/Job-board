@@ -1,5 +1,24 @@
-import { Link, useLocation } from "react-router-dom";
-import { IconBriefcaseFilled, IconFileFilled } from "@tabler/icons-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { IconBriefCase } from "@/assets/icons";
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  User,
+} from "@nextui-org/react";
+import {
+  IconBarChart,
+  IconBuildings,
+  IconFile,
+  IconFileLike,
+  IconUsers,
+} from "../assets/icons";
+import { useAuth } from "../hooks/useAuth";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { logout } from "../api/auth";
+import { toast } from "sonner";
+import logo from "@/assets/logo.png";
 
 const Layout = ({ children }) => {
   return (
@@ -10,7 +29,7 @@ const Layout = ({ children }) => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="py-4 px-8 border-b shadow-sm">
+        <header className="py-4 px-8 border-b shadow-sm h-20">
           <div className="ml-auto w-max">
             <UserDropDown />
           </div>
@@ -24,15 +43,23 @@ const Layout = ({ children }) => {
 
 export default Layout;
 
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-  User,
-} from "@nextui-org/react";
-
 const UserDropDown = () => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  const logoutMutation = useMutation({
+    mutationFn: logout,
+    onSuccess: () => {
+      queryClient.clear();
+      toast.success("Logged out successfully");
+      navigate("/sign-in");
+    },
+    onError: () => {
+      toast.error("Failed to log out");
+    },
+  });
+
   return (
     <div className="flex items-center gap-4">
       <Dropdown placement="bottom-end">
@@ -41,22 +68,29 @@ const UserDropDown = () => {
             as="button"
             avatarProps={{
               isBordered: true,
-              fallback: "TR",
+              fallback: user.name
+                .split(" ")
+                .map((n) => n[0])
+                .join(""),
             }}
             className="transition-transform"
-            description="@tonyreichert"
-            name="Tony Reichert"
+            description={user.email}
+            name={user.name}
           />
         </DropdownTrigger>
         <DropdownMenu aria-label="User Actions" variant="flat">
           <DropdownItem key="profile" className="h-14 gap-2">
             <p className="font-bold">Signed in as</p>
-            <p className="font-bold">@tonyreichert</p>
+            <p className="font-bold">{user.email}</p>
           </DropdownItem>
           <DropdownItem key="help_and_feedback">
-            <Link to="/profile">Profile</Link>
+            <Link to="/dashboard/profile">Profile</Link>
           </DropdownItem>
-          <DropdownItem key="logout" color="danger">
+          <DropdownItem
+            key="logout"
+            color="danger"
+            onClick={() => logoutMutation.mutate()}
+          >
             Log Out
           </DropdownItem>
         </DropdownMenu>
@@ -65,39 +99,78 @@ const UserDropDown = () => {
   );
 };
 
-const links = [
+const studentLinks = [
   {
     title: "My Applications",
-    href: "/dashbaord/my-applications",
-    icon: IconFileFilled,
+    href: "/dashboard/my-applications",
+    icon: IconFile,
   },
   {
     title: "Available Jobs",
     href: "/dashboard/available-jobs",
-    icon: IconBriefcaseFilled,
+    icon: IconBriefCase,
+  },
+];
+
+const companyLinks = [
+  {
+    title: "My Job Openings",
+    href: "/dashboard/my-jobs",
+    icon: IconBriefCase,
+  },
+  {
+    title: "Manage Applications",
+    href: "/dashboard/manage-applications",
+    icon: IconFileLike,
+  },
+];
+
+const adminLinks = [
+  {
+    title: "Placement Stats",
+    href: "/dashboard/stats",
+    icon: IconBarChart,
+  },
+  {
+    title: "Manage Students",
+    href: "/dashboard/manage-students",
+    icon: IconUsers,
+  },
+  {
+    title: "Manage Companies",
+    href: "/dashboard/manage-companies",
+    icon: IconBuildings,
   },
 ];
 
 const Sidebar = () => {
   const location = useLocation();
+  const { user } = useAuth();
+  const links =
+    user.role === "student"
+      ? studentLinks
+      : user.role === "company"
+        ? companyLinks
+        : adminLinks;
 
   return (
-    <div className="w-60 shadow-md">
-      <div className="p-4 px-8">
-        <h3 className="text-3xl font-semibold">CPS</h3>
+    <div className="w-64 shadow-md">
+      <div className="p-8 px-4 border-b h-20 flex items-center">
+        <img className="w-full max-w-full mr-20 rounded-md" src={logo}></img>
       </div>
       <nav className="mt-4 px-4 space-y-2">
         {links.map((link) => (
           <Link
             key={link.href}
             to={link.href}
-            className={`flex items-center py-2 rounded-md px-4 text-gray-700 hover:bg-gray-200" ${
-              location === link.href && "bg-gray-200"
+            className={`flex items-center py-2 rounded-md px-4 text-gray-700 hover:bg-gray-200 " ${
+              location.pathname === link.href &&
+              "bg-primary text-white hover:bg-primary"
             }
             )`}
           >
-            <link.icon size={24} />
-            <span className="mx-4">{link.title}</span>
+            <link.icon className="h-5 w-5" />
+            <span className="mx-2">{link.title}</span>
           </Link>
         ))}
       </nav>

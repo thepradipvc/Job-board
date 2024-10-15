@@ -16,21 +16,21 @@ export default function SignIn() {
   const mutation = useMutation({
     mutationFn: login,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["authStatus"] });
+      queryClient.clear();
       navigate("/dashboard");
       toast.success("Logged in successfully");
     },
     onError: (error) => {
       toast.error(error.response.data.message);
-    }
-  })
+    },
+  });
 
   const handleSubmit = () => {
     if (!email || !password) {
       toast.error("Please fill in all fields");
       return;
     }
-    
+
     mutation.mutate({ email, password });
   };
 
@@ -63,7 +63,12 @@ export default function SignIn() {
                   required
                 />
               </div>
-              <Button onClick={handleSubmit} type="submit" className="w-full" color="primary">
+              <Button
+                onClick={handleSubmit}
+                type="submit"
+                className="w-full"
+                color="primary"
+              >
                 Sign in
               </Button>
             </div>

@@ -13,10 +13,14 @@ import Dashboard from "./pages/dashbaord";
 import Home from "./pages/Home";
 import SignIn from "./pages/sign-in";
 import Signup from "./pages/sign-up";
-
-const MyApplications = () => {
-  return <div>My Applications</div>;
-};
+import MyApplications from "./pages/my-applications";
+import Stats from "./pages/stats";
+import AvailableJobs from "./pages/available-jobs";
+import MyJobs from "./pages/my-jobs";
+import ManageApplications from "./pages/manage-applications";
+import ManageStudents from "./pages/manage-students";
+import ManageCompanies from "./pages/manage-companies";
+import Profile from "./pages/profile";
 
 const router = createBrowserRouter([
   {
@@ -29,18 +33,20 @@ const router = createBrowserRouter([
     element: <Dashboard />,
     errorElement: <ErrorPage />,
     children: [
+      { path: "/dashboard/profile", element: <Profile /> },
       // Student routes
-      // { path: "profile", element: <StudentProfile /> },
-      { path: "/dashbaord/my-applications", element: <MyApplications /> },
-      //   { path: "jobs", element: <JobListings /> },
-      //   // Company routes
-      //   { path: "company-profile", element: <CompanyProfile /> },
-      //   { path: "post-job", element: <PostJob /> },
-      //   { path: "manage-applications", element: <ManageApplications /> },
-      //   // Admin routes
-      //   { path: "manage-users", element: <ManageUsers /> },
-      //   { path: "manage-jobs", element: <ManageJobs /> },
-      //   { path: "statistics", element: <Statistics /> },
+      { path: "/dashboard/my-applications", element: <MyApplications /> },
+      { path: "/dashboard/available-jobs", element: <AvailableJobs /> },
+      // Company routes
+      { path: "/dashboard/my-jobs", element: <MyJobs /> },
+      {
+        path: "/dashboard/manage-applications",
+        element: <ManageApplications />,
+      },
+      // Admin routes
+      { path: "/dashboard/stats", element: <Stats /> },
+      { path: "/dashboard/manage-students", element: <ManageStudents /> },
+      { path: "/dashboard/manage-companies", element: <ManageCompanies /> },
     ],
   },
   {

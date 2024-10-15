@@ -17,14 +17,14 @@ export default function Signup() {
   const mutation = useMutation({
     mutationFn: register,
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ["authStatus"]});
+      queryClient.clear();
       navigate("/dashboard");
       toast.success("Registered successfully");
     },
     onError: (error) => {
       toast.error(error.response.data.message);
-    }
-  })
+    },
+  });
 
   const handleSubmit = () => {
     if (!name || !email || !password) {
@@ -32,7 +32,7 @@ export default function Signup() {
       return;
     }
 
-    mutation.mutate({name, email, password});
+    mutation.mutate({ name, email, password });
   };
 
   return (
@@ -74,8 +74,14 @@ export default function Signup() {
                   required
                 />
               </div>
-              
-              <Button isLoading={mutation.isPending} onClick={handleSubmit} type="submit" className="w-full" color="primary">
+
+              <Button
+                isLoading={mutation.isPending}
+                onClick={handleSubmit}
+                type="submit"
+                className="w-full"
+                color="primary"
+              >
                 Sign up
               </Button>
             </div>

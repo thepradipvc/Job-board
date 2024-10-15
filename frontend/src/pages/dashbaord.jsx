@@ -1,56 +1,42 @@
 import React from "react";
 import { useAuth } from "../hooks/useAuth";
-import { Outlet, Navigate, Link } from "react-router-dom";
+import { Outlet, Navigate, Link, useLocation } from "react-router-dom";
 import Layout from "@/components/layout";
+import { CircularProgress } from "@nextui-org/react";
 
 const Dashboard = () => {
-  // const { user } = useAuth();
+  const { user, isLoading, isAuthenticated } = useAuth();
+  const location = useLocation();
 
-  // if (!user) {
-  //   return <Navigate to="/sign-in" replace />;
-  // }
+  if (isLoading) {
+    return (
+      <div className="min-h-screen grid place-items-center">
+        <CircularProgress aria-label="Loading..." />
+      </div>
+    );
+  }
 
-  // const renderDashboard = () => {
-  //   switch (user.role) {
-  //     case "student":
-  //       return <StudentDashboard />;
-  //     case "company":
-  //       return <StudentDashboard />;
-  //     case "admin":
-  //       return <StudentDashboard />;
-  //     default:
-  //       return <div>Invalid user role</div>;
-  //   }
-  // };
+  if (!isAuthenticated) {
+    return <Navigate to="/sign-in" replace />;
+  }
+
+  if (location.pathname === "/dashboard") {
+    if (user.role === "admin") {
+      return <Navigate to="/dashboard/stats" replace />;
+    }
+    if (user.role === "student") {
+      return <Navigate to="/dashboard/my-applications" replace />;
+    }
+    if (user.role === "company") {
+      return <Navigate to="/dashboard/my-jobs" replace />;
+    }
+  }
 
   return (
     <Layout>
-      <h1>Welcome to your dashboard, Bro</h1>
-      {/* {renderDashboard()} */}
       <Outlet />
     </Layout>
   );
 };
 
 export default Dashboard;
-
-const StudentDashboard = () => {
-  return (
-    <div>
-      <h2>Student Dashboard</h2>
-      <nav>
-        <ul>
-          <li>
-            <Link to="/dashboard/profile">My Profile</Link>
-          </li>
-          <li>
-            <Link to="/dashboard/jobs">Job Listings</Link>
-          </li>
-          <li>
-            <Link to="/dashboard/applications">My Applications</Link>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  );
-};
