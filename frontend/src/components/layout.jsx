@@ -14,11 +14,11 @@ import {
   IconFileLike,
   IconUsers,
 } from "../assets/icons";
-import { useAuth } from "../hooks/useAuth";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { logout } from "../api/auth";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getMe, logout } from "../api/auth";
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
+import Loader from "./loader";
 
 const Layout = ({ children }) => {
   return (
@@ -44,9 +44,13 @@ const Layout = ({ children }) => {
 export default Layout;
 
 const UserDropDown = () => {
-  const { user } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+
+  const { data, isPending } = useQuery({
+    queryFn: getMe,
+    queryKey: ["me"],
+  });
 
   const logoutMutation = useMutation({
     mutationFn: logout,
@@ -59,6 +63,12 @@ const UserDropDown = () => {
       toast.error("Failed to log out");
     },
   });
+
+  if (isPending) {
+    return <Loader />;
+  }
+
+  const { user } = data;
 
   return (
     <div className="flex items-center gap-4">
@@ -145,7 +155,17 @@ const adminLinks = [
 
 const Sidebar = () => {
   const location = useLocation();
-  const { user } = useAuth();
+  const { data, isPending } = useQuery({
+    queryFn: getMe,
+    queryKey: ["me"],
+  });
+
+  if (isPending) {
+    return <Loader />;
+  }
+
+  const { user } = data;
+
   const links =
     user.role === "student"
       ? studentLinks

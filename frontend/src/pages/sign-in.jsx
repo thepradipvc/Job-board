@@ -64,6 +64,7 @@ export default function SignIn() {
                 />
               </div>
               <Button
+                isLoading={mutation.isPending}
                 onClick={handleSubmit}
                 type="submit"
                 className="w-full"

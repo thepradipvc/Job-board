@@ -1,20 +1,26 @@
 import React from "react";
-import { useAuth } from "../hooks/useAuth";
 import { Outlet, Navigate, Link, useLocation } from "react-router-dom";
 import Layout from "@/components/layout";
 import { CircularProgress } from "@nextui-org/react";
+import { useQuery } from "@tanstack/react-query";
+import { getMe } from "../api/auth";
 
 const Dashboard = () => {
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { data, isPending } = useQuery({
+    queryFn: getMe,
+    queryKey: ["me"],
+  });
   const location = useLocation();
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <div className="min-h-screen grid place-items-center">
         <CircularProgress aria-label="Loading..." />
       </div>
     );
   }
+
+  const { isLoggedIn: isAuthenticated, user } = data;
 
   if (!isAuthenticated) {
     return <Navigate to="/sign-in" replace />;
